@@ -7,239 +7,242 @@
 <style>
 *{box-sizing:border-box;margin:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0d1117;color:#c9d1d9;max-width:800px;margin:0 auto;padding:24px}
-h1{color:#e94560;font-size:1.3em;letter-spacing:.5px}
-.sub{color:#8b949e;font-size:.8em;margin:4px 0 20px}
-.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:20px;margin-bottom:16px}
-label{display:block;font-size:.8em;color:#8b949e;margin-bottom:4px;font-weight:500}
+h1{color:#e94560;font-size:1.2em;letter-spacing:.3px}
+.sub{color:#8b949e;font-size:.78em;margin:4px 0 20px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:20px;margin-bottom:14px}
+.card-title{font-size:.9em;color:#e94560;margin-bottom:12px;font-weight:600}
+label{display:block;font-size:.78em;color:#8b949e;margin-bottom:4px}
 input,select{width:100%;padding:10px 12px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;font-size:.95em}
 input:focus,select:focus{border-color:#e94560;outline:none}
-.row{display:flex;gap:12px;margin-bottom:14px}
+.row{display:flex;gap:12px;margin-bottom:12px}
 .row>*{flex:1}
-.opt{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0 8px}
-.opt label{display:flex;align-items:center;gap:6px;font-size:.82em;color:#c9d1d9;cursor:pointer;background:#21262d;border:1px solid #30363d;border-radius:6px;padding:6px 12px;white-space:nowrap}
+.opt{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.opt label{display:flex;align-items:center;gap:6px;font-size:.82em;cursor:pointer;background:#21262d;border:1px solid #30363d;border-radius:6px;padding:6px 12px;white-space:nowrap}
 .opt label:hover{border-color:#e94560}
-.opt input[type=checkbox]{width:auto}
-pre{font-family:'SFMono-Regular',Consolas,monospace;font-size:.85em;background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:16px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;min-height:80px}
-.copy-btn{background:#e94560;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:.9em;cursor:pointer;float:right;margin-top:-36px}
+.opt input{width:auto}
+pre{font-family:'SFMono-Regular',Consolas,monospace;font-size:.82em;background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:16px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;min-height:70px}
+.copy-btn{background:#e94560;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:.85em;cursor:pointer;float:right;margin-top:-34px}
 .copy-btn:hover{background:#d63850}
 .help{font-size:.75em;color:#8b949e;margin-top:4px}
-.hint{background:#1c2333;border-left:3px solid #e94560;padding:12px 14px;font-size:.82em;color:#8b949e;margin:10px 0;border-radius:0 6px 6px 0;line-height:1.6}
-.hint code{color:#e94560;font-size:.9em}
-.examples{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
-.examples button{background:#21262d;border:1px solid #30363d;border-radius:12px;padding:3px 10px;font-size:.78em;color:#8b949e;cursor:pointer}
-.examples button:hover{border-color:#e94560;color:#e94560}
-.preview{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
-.preview .tag{border:1px dashed #30363d;border-radius:4px;padding:6px 10px;font-family:monospace;font-size:.82em;color:#8b949e}
-.preview .tag .hl{color:#e94560}
-.tag-active{background:#e94560;color:#fff;border:1px solid #e94560;border-radius:12px;padding:4px 12px;font-size:.78em;display:inline-block;margin:2px}
-.hidden{display:none}
+.live-test{font-family:monospace;font-size:.8em;background:#1c2333;border:1px solid #30363d;border-radius:6px;padding:10px 14px;margin:8px 0;line-height:1.8;min-height:34px}
+.live-test .yes{color:#3fb950}
+.live-test .no{color:#8b949e}
+.live-test .selected{background:#e94560;color:#fff;padding:1px 6px;border-radius:3px;font-size:.85em}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.pills button{background:#21262d;border:1px solid #30363d;border-radius:12px;padding:3px 10px;font-size:.78em;color:#8b949e;cursor:pointer}
+.pills button:hover,.pills button.active{border-color:#e94560;color:#e94560;background:#2d1b33}
 </style>
 </head>
 <body>
+
 <h1>🐳 WUD Label Generator</h1>
-<p class="sub">Docker Label für What's Up Docker generieren – einfach nur das Image eintragen</p>
+<p class="sub">Docker Label für What's Up Docker – Image eintragen, Labels erhalten</p>
 
 <div class="card">
-<label>📦 Docker-Image</label>
-<div class="row" style="margin-bottom:4px">
-<input id="image" value="docker.io/valkey/valkey:9-alpine" placeholder="z.B. nginx:stable-alpine oder valkey/valkey:9-alpine" oninput="onImage()">
-</div>
-<div class="examples" id="examples">
-<button onclick="setImage('valkey/valkey:9-alpine')">valkey/valkey:9-alpine</button>
-<button onclick="setImage('nginx:stable-alpine3.21-slim')">nginx:stable-alpine3.21</button>
-<button onclick="setImage('traefik:3.3')">traefik:3.3</button>
-<button onclick="setImage('mariadb:11.7.2')">mariadb:11.7.2</button>
-<button onclick="setImage('postgres:17-alpine')">postgres:17-alpine</button>
-<button onclick="setImage('pihole/pihole:v5.8.1')">pihole/pihole:v5.8.1</button>
-<button onclick="setImage('homeassistant/home-assistant:2025.11.0')">home-assistant:2025.11</button>
-</div>
-<div class="help">Drücke ⏎ nach Änderung oder klicke auf ein Beispiel</div>
+<div class="card-title">📦 Docker-Image</div>
+<input id="image" placeholder="z.B. valkey/valkey:9-alpine" oninput="parseImage()">
 </div>
 
 <div class="card">
-<h2 style="font-size:.95em;color:#e94560;margin-bottom:10px;font-weight:600">🔧 Zusätzliche Optionen</h2>
+<div class="card-title">🔧 Zusätzliche Optionen</div>
 <div class="opt">
-<label><input type="checkbox" id="digest" onchange="onImage()"> Digest-Tracking <span style="color:#8b949e;font-size:.85em">(für latest-Tags)</span></label>
-<label><input type="checkbox" id="excludeWud" onchange="onImage()"> WUD-Monitoring ausschließen</label>
-<label><input type="checkbox" id="trigger" onchange="onImage()"> Auto-Update aktivieren</label>
+<label><input type="checkbox" id="optDigest" onchange="build()"> Digest-Tracking</label>
+<label><input type="checkbox" id="optExclude" onchange="build()"> Monitoring deaktivieren</label>
+<label><input type="checkbox" id="optUpdate" onchange="build()"> Auto-Update</label>
 </div>
 <div class="row">
 <div>
-<label>Verzögerung (Delay)</label>
-<select id="delay" onchange="onImage()">
+<label>Verzögerung</label>
+<select id="optDelay" onchange="build()">
 <option value="">Kein Delay</option>
 <option value="1d">1 Tag</option>
-<option value="3d">3 Tage (empfohlen)</option>
+<option value="3d">3 Tage</option>
 <option value="7d">1 Woche</option>
 </select>
 </div>
 <div>
 <label>Update-Schwelle</label>
-<select id="threshold" onchange="onImage()">
+<select id="optThreshold" onchange="build()">
 <option value="">Alle Updates</option>
-<option value="major">Nur Major-Updates</option>
+<option value="major">Nur Major</option>
 <option value="minor">Minor + Patch</option>
 </select>
 </div>
 </div>
 </div>
 
-<div class="card" id="hintBox">
-<h2 style="font-size:.8em;color:#8b949e;margin-bottom:8px;font-weight:600">ℹ️  Erkannt & Vorschläge</h2>
-<div id="hints"></div>
-
-<div style="margin-top:12px">
-<label style="margin-bottom:6px">🏷️ Tag-Filter (Regex) – wird automatisch ermittelt, kann angepasst werden</label>
-<input id="tagFilter" oninput="onImage()">
-<div class="help" id="filterHelp">Regex für Tags, die überwacht werden sollen</div>
+<div class="card">
+<div class="card-title">🏷️  Include-Filter</div>
+<div class="pills" id="incPills"></div>
+<input id="incFilter" placeholder="z.B. ^\d+\.\d+\.\d+$" oninput="build()">
+<div class="help" id="incDesc"></div>
+<div class="live-test" id="incTest">← Tag eingeben, um Match zu sehen</div>
 </div>
+
+<div class="card">
+<div class="card-title">🚫 Exclude-Filter (optional)</div>
+<div class="pills" id="excPills"></div>
+<input id="excFilter" placeholder="z.B. ^.*(rc|beta|dev).*$" oninput="build()">
+<div class="help">Beispiele: <code>^.*(rc|beta|alpha).*$</code> – keine Pre-Releases · <code>^.*-(unstable|dev).*$</code> – keine Dev-Builds</div>
+<div class="live-test" id="excTest">← Tag eingeben, um Auschluss zu prüfen</div>
 </div>
 
 <div class="card" style="position:relative">
-<h2 style="font-size:.9em;color:#e94560;margin-bottom:10px;font-weight:600">📋 Ausgabe</h2>
+<div class="card-title">📋 Ausgabe</div>
 <button class="copy-btn" onclick="copyOut()">📋</button>
-<pre id="output"># Image eingeben, um Labels zu sehen</pre>
+<pre id="output"># Labels erscheinen hier</pre>
 </div>
-</body>
+
 <script>
-const FILTER_EXAMPLES = {
-  '^\\d+\\.\\d+\\.\\d+$':    {desc:'Standard SemVer (1.2.3)', example:'1.2.3 → 1.2.4'},
-  '^\\d+\\.\\d+\\.\\d+-alpine$': {desc:'SemVer + Alpine', example:'9.0.2-alpine → 9.0.3-alpine'},
-  '^v\\d+\\.\\d+\\.\\d+$':   {desc:'SemVer mit v-Präfix', example:'v5.8.1 → v5.8.2'},
-  '^\\d+\\.\\d+$':           {desc:'Nur Major.Minor', example:'3.3 → 3.4'},
-  '^\\d+-alpine$':           {desc:'Einfach + Alpine', example:'17-alpine → 18-alpine'},
-  '^stable-alpine\\d+\\.\\d+.*$': {desc:'Stable + Alpine', example:'stable-alpine3.21 → …'},
-  'latest':                  {desc:'Mutable Tag (latest)', example:'latest + Digest-Tracking'},
-};
+const PILL_DEFS = [
+  {label:'SemVer 1.2.3',      filter:'^\\d+\\.\\d+\\.\\d+$',      desc:'Standard 3-teilig: 1.2.3 → 1.2.4'},
+  {label:'+ Alpine',          filter:'^\\d+\\.\\d+\\.\\d+-alpine$', desc:'SemVer mit Alpine-Suffix: 9.0.2-alpine → 9.0.3-alpine'},
+  {label:'+ Trixie',          filter:'^\\d+\\.\\d+\\.\\d+-trixie$', desc:'SemVer mit Trixie-Suffix'},
+  {label:'v + SemVer',       filter:'^v\\d+\\.\\d+\\.\\d+$',      desc:'Mit v-Präfix: v5.8.1 → v5.8.2'},
+  {label:'Major.Minor',       filter:'^\\d+\\.\\d+$',             desc:'Nur 2-stellig: 3.3 → 3.4'},
+  {label:'Zahl + Alpine',    filter:'^\\d+-alpine$',             desc:'Einfach + Alpine: 17-alpine → 18-alpine'},
+  {label:'Zahl + Trixie',    filter:'^\\d+-trixie$',            desc:'Einfach + Trixie'},
+  {label:'Stable + Alpine',  filter:'^stable-alpine\\d+\\.\\d+.*$', desc:'Stable-Version: stable-alpine3.21'},
+  {label:'latest (mutable)', filter:'latest',                     desc:'Latest-Tag + Digest-Tracking empfohlen'},
+];
+
+const EXC_PILLS = [
+  {label:'Keine RCs',         filter:'^.*(rc|RC).*$'},
+  {label:'Keine Beta',        filter:'^.*(beta|BETA).*$'},
+  {label:'Keine Alpha',       filter:'^.*(alpha|ALPHA).*$'},
+  {label:'Keine Dev/Unstable',filter:'^.*-(dev|unstable|nightly).*$'},
+];
 
 function v(i){return document.getElementById(i).value}
 function c(i){return document.getElementById(i).checked}
 
-function setImage(img){
-  document.getElementById('image').value = img;
-  onImage();
-}
+let currentTag = '';
 
-function onImage(){
+function parseImage(){
   const img = v('image');
-  const tagMatch = img.match(/:([^@]+)/);
-  const tag = tagMatch ? tagMatch[1] : '';
-  const name = tag ? img.replace(/:[^@]+.*$/,'').replace(/.*\//,'') : 'container';
+  const m = img.match(/:([^@]+)/);
+  currentTag = m ? m[1] : '';
+  const name = img.replace(/:.*/,'').replace(/.*\//,'');
   
-  // Filter-Vorschläge
-  const candidates = [];
-  if (/^\d+\.\d+\.\d+/.test(tag) && tag.includes('alpine')) candidates.push('^\\d+\\.\\d+\\.\\d+-alpine$');
-  else if (/^\d+\.\d+\.\d+/.test(tag)) candidates.push('^\\d+\\.\\d+\\.\\d+$');
-  if (/^v\d+/.test(tag)) candidates.push('^v\\d+\\.\\d+\\.\\d+$');
-  if (/^\d+\.\d+$/.test(tag) && !/^\d+\.\d+\.\d+/.test(tag)) candidates.push('^\\d+\\.\\d+$');
-  if (/^\d+-alpine$/.test(tag)) candidates.push('^\\d+-alpine$');
-  if (/stable-alpine/.test(tag)) candidates.push('^stable-alpine\\d+\\.\\d+.*$');
-  if (/latest/.test(tag) || !tag) { candidates.push('latest'); }
-  if (candidates.length === 0) candidates.push('^\\d+\\.\\d+\\.\\d+$');
-
-  // Aktuellen Filter setzen (ersten Candidate)
-  const current = v('tagFilter');
-  const field = document.getElementById('tagFilter');
-  if (!current || !candidates.includes(current)) {
-    field.value = candidates[0];
-  }
-  field.placeholder = candidates[0];
-
-  // Hints anzeigen
-  const hints = document.getElementById('hints');
+  // Include-Pills
+  const incDiv = document.getElementById('incPills');
+  const candidates = suggestFilters(currentTag);
   let html = '';
-  
-  // Tag-Info
-  const tagInfo = tag || '(kein Tag – latest)';
-  html += `<div class="preview">`;
-  html += `<span class="tag">Tag: <span class="hl">${tagInfo}</span></span>`;
-  if (!tag) html += `<span class="tag">Empfohlen: <span class="hl">Digest-Tracking</span></span>`;
-  html += `</div>`;
-  
-  // Version erkennen
-  const ver = tag.match(/(\d+)\.(\d+)(?:\.(\d+))?/);
-  if (ver) {
-    const url = `https://github.com/${img.replace(/:.*/,'')}/releases/tag/v$` + `{major}.$` + `{minor}.$` + `{patch}`;
-    html += `<div class="hint"><b>🔗 Changelog-Vorschlag:</b> <code style="font-size:.82em">${url}</code></div>`;
-  }
-  
-  // Filter-Erklärung
-  const chosen = v('tagFilter');
-  const ex = FILTER_EXAMPLES[chosen];
-  if (ex) {
-    html += `<div class="hint">`;
-    html += `<b>🏷️  Gewählter Filter:</b> <code>${chosen}</code><br>`;
-    html += `<span style="color:#c9d1d9">${ex.desc}</span><br>`;
-    html += `<span>Beispiel: <code style="color:#e94560">${ex.example}</code></span>`;
-    html += `</div>`;
-  }
-
-  // Alternative Filter
-  html += `<div style="margin-top:8px"><span style="font-size:.8em;color:#8b949e">Alternative Filter:</span> `;
-  candidates.forEach(c => {
-    html += `<span class="tag-active" style="cursor:pointer" onclick="setFilter('${c.replace(/'/g,"\\'")}')">${c}</span>`;
+  candidates.forEach(f => {
+    const def = PILL_DEFS.find(d => d.filter === f);
+    const label = def ? def.label : f;
+    html += `<button onclick="setFilter('incFilter','${f.replace(/'/g,"\\'")}',this)">${label}</button>`;
   });
-  html += `</div>`;
+  // Alle Pills anzeigen
+  html += '<span style="color:#30363d;font-size:.78em;padding:3px 4px">|</span>';
+  PILL_DEFS.forEach(d => {
+    html += `<button onclick="setFilter('incFilter','${d.filter.replace(/'/g,"\\'")}',this)">${d.label}</button>`;
+  });
+  incDiv.innerHTML = html;
+  document.getElementById('incFilter').placeholder = candidates[0] || '^\\d+\\.\\d+\\.\\d+$';
+  if(!v('incFilter')) document.getElementById('incFilter').value = candidates[0] || '';
   
-  // Regex-Hilfe
-  html += `<div style="margin-top:10px;font-size:.78em;color:#8b949e;line-height:1.8">`;
-  html += `<b>Regex-Kurzreferenz:</b> `;
-  html += `<code>\\d</code> = Ziffer &nbsp; <code>+</code> = 1 oder mehr &nbsp; <code>.</code> = beliebiges Zeichen &nbsp; <code>\\.</code> = Punkt &nbsp; <code>^…$</code> = exakter Match`;
-  html += `</div>`;
-  
-  // Include/Exclude Beispiele
-  html += `<div style="margin-top:10px;font-size:.78em;color:#8b949e;line-height:1.8">`;
-  html += `<b>Include-Beispiele:</b> `;
-  html += `<code>^\\d+\\.\\d+\\.\\d+$</code> = nur 1.2.3 &nbsp; `;
-  html += `<code>^v\\d+\\.\\d+\\.\\d+$</code> = v1.2.3 &nbsp; `;
-  html += `<code>^\\d+\\.\\d+\\.\\d+-alpine$</code> = nur Alpine-Versionen<br>`;
-  html += `<b>Exclude-Beispiele:</b> `;
-  html += `<code>^.*(rc|beta|alpha).*$</code> = keine Pre-Releases &nbsp; `;
-  html += `<code>^.*-(dev|unstable).*$</code> = keine Dev-Builds`;
-  html += `</div>`;
-  
-  hints.innerHTML = html;
-
-  // Labels generieren
-  generate(tag, name);
+  build();
 }
 
-function setFilter(f){
-  document.getElementById('tagFilter').value = f;
-  onImage();
+function suggestFilters(tag){
+  const c=[];
+  if(!tag) { c.push('latest'); return c; }
+  if(/^\d+\.\d+\.\d+/.test(tag) && tag.includes('alpine')) c.push('^\\d+\\.\\d+\\.\\d+-alpine$');
+  else if(/^\d+\.\d+\.\d+/.test(tag)) c.push('^\\d+\\.\\d+\\.\\d+$');
+  if(/^\d+\.\d+\.\d+/.test(tag) && tag.includes('trixie')) c.push('^\\d+\\.\\d+\\.\\d+-trixie$');
+  if(/^v\d+/.test(tag)) c.push('^v\\d+\\.\\d+\\.\\d+$');
+  if(/^\d+\.\d+$/.test(tag) && !/^\d+\.\d+\.\d+/.test(tag)) c.push('^\\d+\\.\\d+$');
+  if(/^\d+-alpine$/.test(tag)) c.push('^\\d+-alpine$');
+  if(/^\d+-trixie$/.test(tag)) c.push('^\\d+-trixie$');
+  if(/stable-alpine/.test(tag)) c.push('^stable-alpine\\d+\\.\\d+.*$');
+  if(tag === 'latest' || !tag) c.push('latest');
+  if(c.length===0) c.push('^\\d+\\.\\d+\\.\\d+$');
+  return c;
 }
 
-function generate(tag, name){
+function setFilter(fieldId, val, btn){
+  document.getElementById(fieldId).value = val;
+  document.querySelectorAll('#'+fieldId.replace('Filter','Pills')+' button').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  build();
+}
+
+function testRegex(pat, tag, containerId){
+  const el = document.getElementById(containerId);
+  let html = '';
+  if(pat && tag && tag !== 'latest'){
+    try {
+      const r = new RegExp(pat.replace(/\\\(/g,'(').replace(/\\\)/g,')'));
+      const match = r.test(tag);
+      html += `<span class="${match?'yes':'no'}">${match?'✅ MATCH':'❌ Kein Match'}</span> `;
+      html += `<span style="color:#8b949e">» ${pat} » testen mit <b>${tag}</b></span>`;
+    } catch(e) {
+      html += `<span class="no">⚠️ Ungültiger Regex</span>`;
+    }
+  } else if(containerId === 'excTest' && !tag){
+    html = `<span style="color:#8b949e">← Tag eingeben, um Auschluss zu prüfen</span>`;
+  } else if(!tag){
+    html = `<span style="color:#8b949e">← Tag eingeben, um Match zu sehen</span>`;
+  }
+  el.innerHTML = html || `<span style="color:#8b949e">${tag ? '⚠️ Kein Regex eingegeben' : '← Tag eingeben, um Match zu sehen'}</span>`;
+}
+
+// Exclude-Pills erstellen
+(function(){
+  const div = document.getElementById('excPills');
+  EXC_PILLS.forEach(d => {
+    const b = document.createElement('button');
+    b.textContent = d.label;
+    b.onclick = function(){ setFilter('excFilter', d.filter, this); };
+    div.appendChild(b);
+  });
+  // Clear-Button
+  const clear = document.createElement('button');
+  clear.textContent = '✕ löschen';
+  clear.style.cssText = 'color:#8b949e;font-size:.78em';
+  clear.onclick = function(){ document.getElementById('excFilter').value=''; build(); document.querySelectorAll('#excPills button').forEach(b=>b.classList.remove('active')); };
+  div.appendChild(clear);
+})();
+
+function build(){
+  const filter = v('incFilter');
+  const exclude = v('excFilter');
+  const digest = c('optDigest');
+  const noWatch = c('optExclude');
+  const autoUp = c('optUpdate');
+  const delay = v('optDelay');
+  const thr = v('optThreshold');
   const img = v('image');
-  const filter = v('tagFilter');
-  const digest = c('digest');
-  const exclude = c('excludeWud');
-  const autoUpdate = c('trigger');
-  const delay = v('delay');
-  const threshold = v('threshold');
-  const hasLatest = !tag || tag === 'latest';
+  const m = img.match(/:([^@]+)/);
+  const tag = m ? m[1] : '';
+  const name = img.replace(/:.*/,'').replace(/.*\//,'') || 'container';
   
+  // Live-Tests aktualisieren
+  testRegex(filter, tag, 'incTest');
+  testRegex(exclude, tag, 'excTest');
+  
+  // Include-Hilfe
+  const def = PILL_DEFS.find(d => d.filter === filter);
+  document.getElementById('incDesc').textContent = def ? def.desc : '';
+  
+  // Labels bauen
   let L = [];
-  L.push(`  ${name || 'service'}:`);
+  L.push(`  ${name}:`);
   L.push(`    image: ${img || 'image:tag'}`);
-  L.push(`    container_name: ${name || 'container'}`);
+  L.push(`    container_name: ${name}`);
   L.push(`    labels:`);
   
-  const add = (k, val) => {
-    if(val !== '' && val !== null) L.push(`      - "${k}=${val}"`);
-  };
-  const addS = (k, val) => {
-    if(val !== '' && val !== null) L.push(`      - '${k}=${val}'`);
-  };
-
-  if (exclude) add('wud.watch', 'false');
-  if (hasLatest || digest) add('wud.watch.digest', 'true');
-  if (delay) add('wud.watch.delay', delay);
-  if (filter) addS('wud.tag.include', filter);
-  if (autoUpdate) {
-    const trig = 'docker.local' + (threshold ? ':' + threshold : '');
-    add('wud.trigger.include', trig);
-  }
+  const hasNoLabels = !filter && !exclude && !digest && !noWatch && !autoUp && !delay;
+  
+  if (noWatch) L.push(`      - "wud.watch=false"`);
+  if (!tag || tag === 'latest' || digest) L.push(`      - "wud.watch.digest=true"`);
+  if (delay) L.push(`      - "wud.watch.delay=${delay}"`);
+  if (filter && filter !== 'latest') L.push(`      - 'wud.tag.include=${filter}'`);
+  if (exclude) L.push(`      - 'wud.tag.exclude=${exclude}'`);
+  if (autoUp) L.push(`      - "wud.trigger.include=docker.local${thr?':'+thr:''}"`);
+  
+  if (hasNoLabels) L.push(`      # - "wud.watch.digest=true"`);
   
   document.getElementById('output').textContent = L.join('\n');
 }
@@ -251,8 +254,6 @@ function copyOut(){
   b.textContent = '✅';
   setTimeout(() => b.textContent = '📋', 1500);
 }
-
-// Init
-onImage();
 </script>
+</body>
 </html>
