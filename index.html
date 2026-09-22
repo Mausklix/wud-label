@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WUD Label Generator</title>
+<style>
+*{box-sizing:border-box;margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0d1117;color:#c9d1d9;max-width:900px;margin:0 auto;padding:20px}
+h1{color:#e94560;font-size:1.5em;margin-bottom:4px}
+.sub{color:#8b949e;font-size:.85em;margin-bottom:24px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:20px;margin-bottom:16px}
+.card h2{font-size:1em;color:#e94560;margin-bottom:12px;font-weight:600}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.row.full{grid-template-columns:1fr}
+label{display:block;font-size:.8em;color:#8b949e;margin-bottom:4px}
+input,select,textarea{width:100%;padding:8px 10px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#c9d1d9;font-size:.9em}
+input:focus,select:focus,textarea:focus{border-color:#e94560;outline:none}
+textarea{font-family:'SFMono-Regular',Consolas,monospace;font-size:.85em;min-height:200px;resize:vertical}
+pre{font-family:'SFMono-Regular',Consolas,monospace;font-size:.85em;background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:16px;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+.copy-btn{background:#e94560;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:.9em;cursor:pointer;margin-top:8px}
+.copy-btn:hover{background:#d63850}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pill{display:inline-block;background:#21262d;border:1px solid #30363d;border-radius:12px;padding:4px 12px;font-size:.8em;cursor:pointer}
+.pill:hover{border-color:#e94560;color:#e94560}
+.pill.active{background:#e94560;color:#fff;border-color:#e94560}
+.help{font-size:.75em;color:#8b949e;margin-top:4px}
+.toggle-group{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.check-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.check-row input[type=checkbox]{width:auto}
+</style>
+</head>
+<body>
+<h1>🐳 WUD Label Generator</h1>
+<p class="sub">Docker Compose Labels für What's Up Docker (WUD) erstellen</p>
+
+<div class="card">
+<h2>🔧 Container</h2>
+<div class="row">
+<div><label>Container-Name</label><input id="name" value="valkey" oninput="generate()"></div>
+<div><label>Service-Name (optional)</label><input id="serviceLabel" value="valkey" oninput="generate()"></div>
+</div>
+<div class="row">
+<div><label>Image</label><input id="image" value="docker.io/valkey/valkey:9-alpine" oninput="analyzeImage()"></div>
+<div><label>Image-Tag (aktuell)</label><input id="tag" value="9-alpine" oninput="generate()"></div>
+</div>
+<div class="row">
+<div><label>Monitoring</label>
+<select id="watch" onchange="generate()">
+<option value="">Standard (watch=true)</option>
+<option value="true">Aktiv (watch=true)</option>
+<option value="false">Deaktiviert (watch=false)</option>
+</select></div>
+<div><label>Display-Name</label><input id="displayName" placeholder="z.B. Valkey Cache" oninput="generate()"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>🏷️ Tag-Filterung</h2>
+<div class="row full"><label>Vorgeschlagene Filter (basierend auf Image)</label><div id="tagSuggestions" class="toggle-group"></div></div>
+<div class="row">
+<div><label>Tag Include (Regex)</label><input id="tagInclude" value="^\\d+\\.\\d+\\.\\d+-alpine$" oninput="generate()"></div>
+<div><label>Tag Exclude (Regex)</label><input id="tagExclude" placeholder="z.B. ^.*(rc|beta).*$" oninput="generate()"></div>
+</div>
+<div class="row full">
+<label>Tag Transform</label><input id="tagTransform" placeholder="^(\d+\.\d+\.\d+-\d+)-.*$ => $1" oninput="generate()">
+<div class="help">Nur bei nicht-standard Tags nötig</div>
+</div>
+</div>
+
+<div class="card">
+<h2>🔗 Update-Prüfung</h2>
+<div class="row full"><div class="check-row">
+<input type="checkbox" id="watchDigest" onchange="generate()">
+<label for="watchDigest" style="display:inline">Digest-Tracking aktivieren (für mutable Tags wie latest)</label>
+</div></div>
+<div class="row">
+<div><label>Delay (Wartezeit vor Update-Meldung)</label>
+<select id="delay" onchange="generate()">
+<option value="">Kein Delay</option>
+<option value="1d">1 Tag</option><option value="3d">3 Tage</option><option value="7d">1 Woche</option>
+<option value="24h">24 Stunden</option><option value="12h">12 Stunden</option><option value="6h">6 Stunden</option>
+</select></div>
+<div><label>Display Icon</label><input id="displayIcon" placeholder="si:valkey, mdi:database" oninput="generate()"></div>
+</div>
+<div class="row full">
+<label>Changelog Link Template</label><input id="linkTemplate" placeholder="https://github.com/valkey-io/valkey/releases/tag/${major}.${minor}.${patch}" oninput="generate()">
+<div class="help">${container}, ${original}, ${transformed}, ${major}, ${minor}, ${patch}, ${prerelease}</div>
+</div>
+</div>
+
+<div class="card">
+<h2>🎯 Trigger</h2>
+<div class="row">
+<div><label>Trigger Include</label><input id="triggerInclude" oninput="generate()"></div>
+<div><label>Threshold</label>
+<select id="triggerThreshold" onchange="generate()">
+<option value="">Alle Updates</option><option value="major">Nur Major</option><option value="minor">Minor + Patch</option><option value="patch">Nur Patch</option>
+</select></div>
+</div>
+<div class="row">
+<div><label>Trigger Exclude</label><input id="triggerExclude" oninput="generate()"></div>
+<div><label>Stack / Gruppe</label><input id="stack" oninput="generate()"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>📋 Ausgabe</h2>
+<button class="copy-btn" onclick="copyOutput()">📋 Kopieren</button>
+<div class="btn-row" style="margin-bottom:12px">
+<button class="pill active" onclick="setMode('compose')">🐳 Compose</button>
+<button class="pill" onclick="setMode('docker')">🐋 Docker CLI</button>
+<button class="pill" onclick="setMode('swarm')">🐝 Swarm</button>
+<button class="pill" onclick="setMode('k8s')">☸️ Kubernetes</button>
+<button class="pill" onclick="setMode('nomad')">🟢 Nomad</button>
+</div>
+<pre id="output"># WUD Labels erscheinen hier</pre>
+</div>
+
+<div class="card">
+<h2>💡 Beispiel-Images</h2>
+<div class="btn-row" id="examples">
+<span class="pill" onclick="loadExample('valkey')">valkey/valkey:9-alpine</span>
+<span class="pill" onclick="loadExample('nginx')">nginx:stable-alpine3.21</span>
+<span class="pill" onclick="loadExample('traefik')">traefik:3.3</span>
+<span class="pill" onclick="loadExample('mariadb')">mariadb:11.7</span>
+<span class="pill" onclick="loadExample('postgres')">postgres:17-alpine</span>
+</div>
+</div>
+
+<script>
+const EXAMPLES = {
+  valkey:{name:'valkey',service:'valkey',image:'docker.io/valkey/valkey:9-alpine',tag:'9-alpine',include:'^\\d+\\.\\d+\\.\\d+-alpine$',displayName:'Valkey',icon:'si:valkey',link:'https://github.com/valkey-io/valkey/releases/tag/${major}.${minor}.${patch}'},
+  nginx:{name:'nginx',service:'nginx',image:'nginx:stable-alpine3.21-slim',tag:'stable-alpine3.21-slim',include:'^stable-alpine\\d+\\.\\d+.*$',displayName:'Nginx',icon:'si:nginx',link:'https://nginx.org/en/CHANGES'},
+  traefik:{name:'traefik',service:'traefik',image:'traefik:3.3',tag:'3.3',include:'^\\d+\\.\\d+$',displayName:'Traefik',icon:'mdi:docker',link:'https://github.com/traefik/traefik/releases/tag/v${major}.${minor}.${patch}'},
+  mariadb:{name:'mariadb',service:'mariadb',image:'mariadb:11.7.2',tag:'11.7.2',include:'^\\d+\\.\\d+\\.\\d+$',displayName:'MariaDB',icon:'si:mariadb',link:'https://mariadb.com/kb/en/mariadb-${major}${minor}${patch}-changelog'},
+  postgres:{name:'postgres',service:'postgres',image:'postgres:17-alpine',tag:'17-alpine',include:'^\\d+-alpine$',displayName:'PostgreSQL',icon:'si:postgresql',link:'https://www.postgresql.org/docs/release/'}
+};
+let mode='compose';
+function setMode(m){mode=m;document.querySelectorAll('.btn-row')[0].querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));['compose','docker','swarm','k8s','nomad'].forEach((x,i)=>{if(x===m)document.querySelectorAll('.btn-row')[0].querySelectorAll('.pill')[i].classList.add('active')});generate();}
+function analyzeImage(){const img=document.getElementById('image').value;const tm=img.match(/:([^@]+)/);if(tm)document.getElementById('tag').value=tm[1];const t=tm?tm[1]:'';const sug=document.getElementById('tagSuggestions');sug.innerHTML='';const pats=[];if(/^\d+\.\d+\.\d+/.test(t))pats.push('^\\d+\\.\\d+\\.\\d+$');if(t.includes('alpine'))pats.push('^\\d+\\.\\d+\\.\\d+-alpine$');if(/^v\d+/.test(t))pats.push('^v\\d+\\.\\d+\\.\\d+$');if(/^\d+\.\d+$/.test(t))pats.push('^\\d+\\.\\d+$');if(/^\d+-alpine$/.test(t))pats.push('^\\d+-alpine$');if(pats.length===0)pats.push('^\\d+\\.\\d+\\.\\d+$');const used=document.getElementById('tagInclude').value;pats.forEach(p=>{const el=document.createElement('span');el.className='pill'+(p===used?' active':'');el.textContent=p;el.onclick=()=>{document.getElementById('tagInclude').value=p;document.querySelectorAll('#tagSuggestions .pill').forEach(e=>e.classList.remove('active'));el.classList.add('active');generate()};sug.appendChild(el)});generate();}
+function v(id){return document.getElementById(id).value}
+function ck(id){return document.getElementById(id).checked}
+function generate(){const name=v('name')||'container';const service=v('serviceLabel')||name;const L=[];if(mode==='compose'){L.push('  '+service+':');L.push('    image: '+(v('image')||'image:tag'));L.push('    container_name: '+name);L.push('    labels:');const add=(k,val)=>{if(!val)L.push('      # - "'+k+'="');else L.push('      - "'+k+'='+val+'"')};const addS=(k,val)=>{if(val)L.push("      - '"+k+"='+val+'")};if(v('watch'))add('wud.watch',v('watch'));if(ck('watchDigest'))add('wud.watch.digest','true');if(v('delay'))add('wud.watch.delay',v('delay'));if(v('tagInclude'))addS('wud.tag.include',v('tagInclude'));if(v('tagExclude'))addS('wud.tag.exclude',v('tagExclude'));if(v('tagTransform'))addS('wud.tag.transform',v('tagTransform'));if(v('displayName'))add('wud.display.name',v('displayName'));if(v('displayIcon'))add('wud.display.icon',v('displayIcon'));if(v('linkTemplate'))add('wud.link.template',v('linkTemplate'));if(v('triggerInclude'))add('wud.trigger.include',v('triggerThreshold')?v('triggerInclude')+':'+v('triggerThreshold'):v('triggerInclude'));if(v('triggerExclude'))add('wud.trigger.exclude',v('triggerExclude'));if(v('stack'))add('wud.stack',v('stack'));}
+else if(mode==='docker'){let line='docker run -d --name '+name;const f=(k,val)=>{if(val)line+=' \\\\\n  --label "'+k+'='+val+'"'};const fS=(k,val)=>{if(val)line+=" \\\\\n  --label '"+k+'='+val+"'"};if(v('watch'))f('wud.watch',v('watch'));if(ck('watchDigest'))f('wud.watch.digest','true');if(v('delay'))f('wud.watch.delay',v('delay'));if(v('tagInclude'))fS('wud.tag.include',v('tagInclude'));if(v('tagExclude'))fS('wud.tag.exclude',v('tagExclude'));if(v('tagTransform'))fS('wud.tag.transform',v('tagTransform'));if(v('displayName'))f('wud.display.name',v('displayName'));if(v('displayIcon'))f('wud.display.icon',v('displayIcon'));if(v('linkTemplate'))f('wud.link.template',v('linkTemplate'));if(v('triggerInclude'))f('wud.trigger.include',v('triggerThreshold')?v('triggerInclude')+':'+v('triggerThreshold'):v('triggerInclude'));if(v('triggerExclude'))f('wud.trigger.exclude',v('triggerExclude'));if(v('stack'))f('wud.stack',v('stack'));line+=' \\\\\n  '+(v('image')||'image:tag');L.push(line);}
+else{const prefix=mode==='swarm'?'wud.':'getwud.app/';L.push('# '+mode.toUpperCase()+': '+('wud.'+(mode==='swarm'?'(deploy.labels)':'(annotations/meta)')));L.push('');const add=(k,val)=>{if(val)L.push(prefix+k+': "'+val+'"')};if(v('watch'))add('watch',v('watch'));if(ck('watchDigest'))add('watch.digest','true');if(v('delay'))add('watch.delay',v('delay'));if(v('tagInclude'))L.push(prefix+"tag.include: '"+v('tagInclude')+"'");if(v('tagExclude'))L.push(prefix+"tag.exclude: '"+v('tagExclude')+"'");if(v('tagTransform'))L.push(prefix+"tag.transform: '"+v('tagTransform')+"'");if(v('displayName'))add('display.name',v('displayName'));if(v('displayIcon'))add('display.icon',v('displayIcon'));if(v('linkTemplate'))add('link.template',v('linkTemplate'));if(v('triggerInclude'))add('trigger.include',v('triggerThreshold')?v('triggerInclude')+':'+v('triggerThreshold'):v('triggerInclude'));if(v('triggerExclude'))add('trigger.exclude',v('triggerExclude'));if(v('stack'))add('stack',v('stack'));}
+document.getElementById('output').textContent=L.join('\n')||'# Keine Labels konfiguriert';}
+function copyOutput(){const o=document.getElementById('output');navigator.clipboard.writeText(o.textContent);const b=document.querySelector('.copy-btn');b.textContent='✅ Kopiert!';setTimeout(()=>b.textContent='📋 Kopieren',2000);}
+function loadExample(k){const d=EXAMPLES[k];if(!d)return;['name','serviceLabel','image','tag','tagInclude','tagExclude','tagTransform','displayName','displayIcon','linkTemplate','triggerInclude','triggerExclude','stack'].forEach(id=>{document.getElementById(id).value=d[id]||''});document.getElementById('watch').value='';document.getElementById('delay').value='';document.getElementById('triggerThreshold').value='';document.getElementById('watchDigest').checked=false;analyzeImage();}
+document.addEventListener('DOMContentLoaded',()=>{analyzeImage();});
+</script>
+</body>
+</html>
