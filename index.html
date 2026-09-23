@@ -169,6 +169,7 @@ function setFilter(fieldId, val, btn){
 }
 
 function testRegex(pat, tag, containerId){
+  pat = pat.replace(/\\\\/g, "\\"); // HTML-Input hat ggf. doppelte Escapes
   const el = document.getElementById(containerId);
   let html = '';
   if(pat && tag && tag !== 'latest'){
@@ -240,7 +241,7 @@ function build(){
   if (delay) L.push(`      - "wud.watch.delay=${delay}"`);
   if (filter && filter !== 'latest') L.push(`      - 'wud.tag.include=${filter}'`);
   if (exclude) L.push(`      - 'wud.tag.exclude=${exclude}'`);
-  if (autoUp) L.push(`      - "wud.trigger.include=docker.local${thr?':'+thr:''}"`);
+  if (autoUp || thr) L.push(`      - "wud.trigger.include=docker.local${thr?':'+thr:''}"`);
   
   if (hasNoLabels) L.push(`      # - "wud.watch.digest=true"`);
   
